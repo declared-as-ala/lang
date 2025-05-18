@@ -1,0 +1,299 @@
+<div class="translate-container animate-fade-in p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- TITLE -->
+    <h1 class="text-3xl font-bold text-primary-700 mb-8 text-center">
+      German Translation
+    </h1>
+
+    <!-- ░░░ Sticky banner — WORD ░░░ -->
+    <div
+      *ngIf="translationType === 'word' && translatedWord"
+      class="sticky top-20 z-20 mb-8"
+    >
+      <div
+        class="bg-primary-50 border-l-4 border-primary-600 p-4 rounded-xl shadow-lg flex items-center gap-6"
+      >
+        <!-- Bigger image -->
+        <img
+          *ngIf="safeImageUrl"
+          [src]="safeImageUrl"
+          alt="Word illustration"
+          class="w-28 h-28 md:w-32 md:h-32 object-cover rounded-xl shadow"
+        />
+
+        <!-- Word + Audio -->
+        <div class="flex flex-col gap-2">
+          <p class="text-lg text-primary-700 font-semibold">
+            Translation:
+            <span class="text-2xl font-bold">{{ translatedWord }}</span>
+          </p>
+          <p *ngIf="pronunciation" class="italic text-gray-600">
+            {{ pronunciation }}
+          </p>
+
+          <!-- 🔊 Play button -->
+          <button
+            type="button"
+            (click)="speakTranslation()"
+            class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-800"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9 4.804v10.392a.75.75 0 01-1.2.6L4.46 13.32H2.25A.75.75 0 011.5 12.57V7.43a.75.75 0 01.75-.75h2.21l3.34-2.476A.75.75 0 019 4.804zm6.75 5.196a4.5 4.5 0 00-3.328-4.358.75.75 0 11.456-1.436 6 6 0 010 11.188.75.75 0 11-.456-1.436 4.5 4.5 0 003.328-4.358z"
+              />
+            </svg>
+            Listen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░░ Sticky banner — TEXT ░░░ -->
+    <div
+      *ngIf="translationType === 'text' && translatedText"
+      class="sticky top-20 z-20 mb-8"
+    >
+      <div
+        class="bg-primary-50 border-l-4 border-primary-600 p-4 rounded-xl shadow-lg"
+      >
+        <h3 class="text-lg text-primary-700 font-semibold mb-2">Translation</h3>
+        <p class="text-gray-800">{{ translatedText }}</p>
+      </div>
+    </div>
+
+    <!-- TOGGLE WORD / TEXT -->
+    <div class="flex justify-center mb-8">
+      <div class="bg-white rounded-full p-1 shadow-md">
+        <button
+          (click)="translationType = 'word'"
+          [ngClass]="{
+            'bg-primary-500 text-white': translationType === 'word',
+            'text-gray-600': translationType !== 'word'
+          }"
+          class="px-6 py-2 rounded-full transition-all"
+        >
+          Word
+        </button>
+        <button
+          (click)="translationType = 'text'"
+          [ngClass]="{
+            'bg-primary-500 text-white': translationType === 'text',
+            'text-gray-600': translationType !== 'text'
+          }"
+          class="px-6 py-2 rounded-full transition-all"
+        >
+          Text
+        </button>
+      </div>
+    </div>
+
+    <!-- WORD FORM + DETAILS -->
+    <div *ngIf="translationType === 'word'" class="space-y-6">
+      <form [formGroup]="wordForm" (ngSubmit)="translateWord()" class="card">
+        <!-- LANGUAGES & SWAP -->
+        <div class="flex items-center gap-4 mb-6">
+          <!-- From -->
+          <div class="flex-1">
+            <label class="form-label">From</label>
+            <select formControlName="fromLanguage" class="form-control">
+              <option *ngFor="let lang of languages" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Swap -->
+          <button
+            type="button"
+            (click)="swapLanguages('word')"
+            class="mt-6 p-3 rounded-full hover:bg-primary-50 transition"
+          >
+            <svg
+              class="w-6 h-6 text-primary-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"
+              />
+            </svg>
+          </button>
+
+          <!-- To -->
+          <div class="flex-1">
+            <label class="form-label">To</label>
+            <select formControlName="toLanguage" class="form-control">
+              <option *ngFor="let lang of languages" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Word input -->
+        <div class="form-group">
+          <input
+            type="text"
+            formControlName="word"
+            class="form-control text-lg"
+            placeholder="Enter a word to translate…"
+          />
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn-primary w-full py-3 text-lg transition"
+          [disabled]="isLoading || wordForm.invalid"
+        >
+          <span *ngIf="isLoading" class="inline-block mr-2">
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </span>
+          {{ isLoading ? "Translating…" : "Translate" }}
+        </button>
+      </form>
+
+      <!-- DETAILS CARD -->
+      <div *ngIf="translatedWord" class="card animate-slide-up">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-xl font-semibold text-primary-700 mb-4">Details</h3>
+
+            <div *ngIf="pronunciation" class="text-gray-600 mb-4">
+              Pronunciation: {{ pronunciation }}
+            </div>
+
+            <div *ngIf="wordContext" class="space-y-2">
+              <h3 class="text-lg font-semibold text-primary-700">Example</h3>
+              <div class="bg-primary-50 p-4 rounded-xl">
+                <p class="text-gray-700">{{ wordContext.english }}</p>
+                <p class="text-primary-700 italic">
+                  {{ wordContext.german }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bigger image in card -->
+          <div *ngIf="safeImageUrl" class="flex items-center justify-center">
+            <img
+              [src]="safeImageUrl"
+              alt="Visual"
+              class="max-w-full md:max-w-xs rounded-xl shadow-lg transform hover:scale-105 transition"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXT form (inchangé sauf scroll)-->
+    <div *ngIf="translationType === 'text'" class="space-y-6">
+      <form
+        [formGroup]="translateForm"
+        (ngSubmit)="translateText()"
+        class="card"
+      >
+        <div class="flex items-center gap-4 mb-6">
+          <div class="flex-1">
+            <label class="form-label">From</label>
+            <select formControlName="fromLanguage" class="form-control">
+              <option *ngFor="let lang of languages" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            (click)="swapLanguages('text')"
+            class="mt-6 p-3 rounded-full hover:bg-primary-50 transition"
+          >
+            <svg
+              class="w-6 h-6 text-primary-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"
+              />
+            </svg>
+          </button>
+
+          <div class="flex-1">
+            <label class="form-label">To</label>
+            <select formControlName="toLanguage" class="form-control">
+              <option *ngFor="let lang of languages" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <textarea
+            formControlName="text"
+            class="form-control min-h-[200px] text-lg"
+            placeholder="Enter text to translate…"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary w-full py-3 text-lg transition"
+          [disabled]="isLoading || translateForm.invalid"
+        >
+          <span *ngIf="isLoading" class="inline-block mr-2">
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </span>
+          {{ isLoading ? "Translating…" : "Translate" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

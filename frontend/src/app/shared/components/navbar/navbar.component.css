@@ -1,0 +1,10 @@
+/* force links to stay on one line */
+.nav-links {
+  white-space: nowrap;
+}
+
+/* ensure dropdown is wide enough */
+.nav-dropdown > div {
+  min-width: 12rem;
+  z-index: 60; /* above other content */
+}

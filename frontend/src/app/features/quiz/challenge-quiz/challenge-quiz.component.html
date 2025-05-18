@@ -1,0 +1,118 @@
+<div class="p-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-6 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <h2 class="text-2xl font-bold text-primary-600">60-Second Challenge</h2>
+        <span class="bg-primary-100 text-primary-800 text-sm font-medium px-3 py-1 rounded-full">
+          Level: {{ userLevel | titlecase }}
+        </span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-lg font-semibold text-primary-600">
+          Score: {{ score }}
+        </div>
+        <div *ngIf="quizStarted && !quizEnded" class="text-lg font-semibold text-gray-600">
+          Time: {{ timeLeft }}s
+        </div>
+        <a [routerLink]="['/dashboard/quiz']" class="text-primary-600 hover:text-primary-700">
+          &larr; Back to Quizzes
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+      {{ error }}
+      <button 
+        (click)="loadQuestions()" 
+        class="ml-4 underline hover:text-red-800"
+      >
+        Try Again
+      </button>
+    </div>
+
+    <!-- Start Screen -->
+    <div *ngIf="!isLoading && !error && !quizStarted" class="text-center py-12">
+      <h3 class="text-2xl font-bold text-primary-700 mb-4">Ready for the Challenge?</h3>
+      <p class="text-gray-600 mb-8">
+        You have 60 seconds to translate as many English phrases to German as you can.
+        Each correct answer earns you points!
+      </p>
+      <button 
+        (click)="startQuiz()" 
+        class="btn-primary text-lg px-8 py-3"
+      >
+        Start Challenge
+      </button>
+    </div>
+
+    <!-- Quiz Content -->
+    <div *ngIf="quizStarted && !quizEnded && questions.length > 0" class="animate-fade-in">
+      <div class="card mb-6">
+        <div class="text-center mb-6">
+          <div class="text-sm text-gray-500 mb-2">Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</div>
+          <div class="h-2 bg-gray-200 rounded-full">
+            <div 
+              class="h-2 bg-primary-600 rounded-full transition-all duration-300"
+              [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100"
+            ></div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Translate to German:</h3>
+        <p class="text-2xl text-primary-700 font-bold mb-6 text-center">{{ questions[currentQuestionIndex].questionEn }}</p>
+
+        <form [formGroup]="answerForm" (ngSubmit)="submitAnswer()" class="space-y-4">
+          <div class="form-group">
+            <input 
+              type="text"
+              formControlName="answer"
+              class="form-control text-lg text-center"
+              placeholder="Type your German translation..."
+            >
+          </div>
+
+          <div class="flex justify-end">
+            <button 
+              type="submit" 
+              class="btn-primary"
+              [disabled]="answerForm.invalid"
+            >
+              {{ currentQuestionIndex === questions.length - 1 ? 'Finish' : 'Next Question' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- End Screen -->
+    <div *ngIf="quizEnded" class="card text-center py-12 animate-fade-in">
+      <h3 class="text-2xl font-bold text-primary-700 mb-4">Challenge Complete!</h3>
+      <div class="text-4xl font-bold text-primary-600 mb-6">
+        Score: {{ score }}
+      </div>
+      <p class="text-gray-600 mb-8">
+        You answered {{ currentQuestionIndex + 1 }} questions in 60 seconds!
+      </p>
+      <div class="space-x-4">
+        <button 
+          (click)="restartQuiz()" 
+          class="btn-primary"
+        >
+          Try Again
+        </button>
+        <a 
+          [routerLink]="['/dashboard/quiz']" 
+          class="btn-secondary"
+        >
+          Back to Quizzes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

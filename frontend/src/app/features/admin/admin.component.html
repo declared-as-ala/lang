@@ -1,0 +1,163 @@
+<div class="flex h-screen bg-gray-100 overflow-hidden">
+  <!-- Sidebar (always visible) -->
+  <aside
+    class="fixed left-0 w-64 bg-white border-r border-gray-200 top-16 bottom-0 z-40 overflow-y-auto"
+  >
+    <!-- Brand -->
+    <div class="px-6 py-5 bg-pink-600">
+      <h2 class="text-2xl font-bold text-white">Admin Panel</h2>
+      <p class="text-sm text-pink-200">Lingomate Management</p>
+    </div>
+
+    <!-- Nav -->
+    <nav class="mt-6 px-2 space-y-1">
+      <!-- Dashboard -->
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Dashboard Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"
+          />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- Users -->
+      <a
+        routerLink="/admin/users"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Users Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-1a4 4 0 00-3-3.87M9 20H4v-1a4 4 0 013-3.87M16 3.13a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
+        <span>Users</span>
+      </a>
+
+      <!-- Flashcards -->
+      <a
+        routerLink="/admin/flashcards"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Flashcards Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 10h16M4 14h16M4 18h16"
+          />
+        </svg>
+        <span>Flashcards</span>
+      </a>
+
+      <!-- Conjugations -->
+      <a
+        routerLink="/admin/conjugations"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Conjugations Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 14l9-5-9-5-9 5 9 5zm0 7v-7"
+          />
+        </svg>
+        <span>Conjugations</span>
+      </a>
+
+      <!-- Synonyms/Antonyms -->
+      <a
+        routerLink="/admin/synonyms"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Synonyms Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"
+          />
+        </svg>
+        <span>Synonyms/Antonyms</span>
+      </a>
+
+      <!-- Fill in Blanks -->
+      <a
+        routerLink="/admin/fill-blanks"
+        routerLinkActive="bg-pink-50 text-pink-700"
+        class="flex items-center px-3 py-2 rounded-md text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors"
+      >
+        <!-- Fill Blanks Icon -->
+        <svg
+          class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-600"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
+                   m-4-9l5 5M13.5 6.5L17 10"
+          />
+        </svg>
+        <span>Fill in Blanks</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main content (pushed right by 16rem) -->
+  <div class="flex-1 flex flex-col md:pl-64">
+    <main class="flex-1 overflow-auto pt-16 p-4 md:p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

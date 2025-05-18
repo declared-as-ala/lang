@@ -1,0 +1,67 @@
+<div class="min-h-screen pt-16">
+  <!-- Sidebar -->
+  <app-dashboard-sidebar
+    class="hidden md:block fixed left-0 top-16 h-[calc(100vh-4rem)]"
+  ></app-dashboard-sidebar>
+
+  <!-- Main Content -->
+  <div class="md:ml-64">
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-primary-700">
+          Welcome, {{ currentUser?.firstName || "User" }}!
+        </h1>
+        <p class="text-gray-600">Continue your language learning journey</p>
+      </header>
+
+      <!-- Score Overview - Only show on quiz routes -->
+      <div
+        *ngIf="isQuizRoute"
+        class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+      >
+        <div class="card">
+          <h3 class="text-lg font-semibold text-primary-700 mb-2">
+            Current Score
+          </h3>
+          <div class="text-3xl font-bold text-primary-600">
+            {{ scoreState.currentScore }}
+          </div>
+          <p class="text-sm text-gray-500">
+            Last updated: {{ scoreState.lastUpdated | date : "short" }}
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="text-lg font-semibold text-primary-700 mb-2">
+            Quizzes Completed
+          </h3>
+          <div class="text-3xl font-bold text-primary-600">
+            {{ scoreState.totalQuizzes }}
+          </div>
+          <p class="text-sm text-gray-500">Total quizzes taken</p>
+        </div>
+
+        <div class="card">
+          <h3 class="text-lg font-semibold text-primary-700 mb-2">
+            Accuracy Rate
+          </h3>
+          <div class="text-3xl font-bold text-primary-600">
+            {{ accuracy | number : "1.0-1" }}%
+          </div>
+          <div class="mt-2 text-sm">
+            <span class="text-green-600"
+              >{{ scoreState.correctAnswers }} correct</span
+            >
+            /
+            <span class="text-red-600"
+              >{{ scoreState.incorrectAnswers }} incorrect</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Router outlet for child routes -->
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

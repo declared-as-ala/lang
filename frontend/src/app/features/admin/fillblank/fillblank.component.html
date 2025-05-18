@@ -1,0 +1,290 @@
+<!-- src/app/features/admin/fillblank/fillblank.component.html -->
+<div class="relative">
+  <!-- Toasts -->
+  <div class="fixed top-5 right-5 space-y-2 z-50">
+    <div
+      *ngFor="let t of toasts"
+      [ngClass]="{
+        'bg-green-100 text-green-800': t.type === 'success',
+        'bg-red-100 text-red-800': t.type === 'error'
+      }"
+      class="flex items-center px-4 py-2 rounded shadow"
+    >
+      <svg
+        *ngIf="t.type === 'success'"
+        class="w-5 h-5 mr-2 text-green-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      <svg
+        *ngIf="t.type === 'error'"
+        class="w-5 h-5 mr-2 text-red-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      <span>{{ t.message }}</span>
+    </div>
+  </div>
+
+  <div class="p-6 space-y-6">
+    <!-- Header/Search/Create -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <h1 class="text-2xl font-bold text-pink-700">Fill-in-the-Blank</h1>
+      <div class="flex items-center space-x-3">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="apply()"
+          placeholder="Search sentence or question..."
+          class="px-3 py-2 border rounded-lg focus:ring-pink-300 focus:outline-none"
+        />
+        <button
+          (click)="openCreate()"
+          class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+        >
+          + New
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center text-gray-500">Loading…</div>
+    <div
+      *ngIf="!isLoading && filtered.length === 0"
+      class="text-center text-gray-500"
+    >
+      No items
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && paged.length > 0" class="overflow-x-auto">
+      <table class="w-full bg-white rounded-lg shadow">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Sentence
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Question
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Correct
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Wrong
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Level
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Score
+            </th>
+            <th class="px-4 py-2 text-right text-sm font-medium text-gray-600">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of paged" class="hover:bg-gray-50">
+            <td class="px-4 py-2">{{ i.sentence }}</td>
+            <td class="px-4 py-2">{{ i.questionText }}</td>
+            <td class="px-4 py-2">{{ i.correctAnswer }}</td>
+            <td class="px-4 py-2">{{ i.wrongAnswers.join(", ") }}</td>
+            <td class="px-4 py-2">{{ i.level }}</td>
+            <td class="px-4 py-2">{{ i.score }}</td>
+            <td class="px-4 py-2 text-right inline-flex space-x-4">
+              <button
+                class="text-pink-600 hover:text-pink-800"
+                (click)="openEdit(i)"
+              >
+                Edit
+              </button>
+              <button
+                class="text-red-600 hover:text-red-800"
+                (click)="confirmDelete(i)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="totalPages > 1"
+      class="flex justify-center items-center space-x-2 pt-4"
+    >
+      <button
+        (click)="prev()"
+        [disabled]="currentPage === 1"
+        class="px-2 py-1 border rounded"
+      >
+        Prev
+      </button>
+      <ng-container
+        *ngFor="let _ of [].constructor(totalPages); let idx = index"
+      >
+        <button
+          (click)="go(idx + 1)"
+          [ngClass]="{
+            'bg-pink-600 text-white': currentPage === idx + 1,
+            'bg-gray-200': currentPage !== idx + 1
+          }"
+          class="px-3 py-1 rounded"
+        >
+          {{ idx + 1 }}
+        </button>
+      </ng-container>
+      <button
+        (click)="next()"
+        [disabled]="currentPage === totalPages"
+        class="px-2 py-1 border rounded"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Create/Edit Modal -->
+  <div
+    *ngIf="showForm"
+    class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 space-y-4">
+      <h2 class="text-xl font-semibold">
+        {{ formMode === "create" ? "New" : "Edit" }} FillBlank
+      </h2>
+      <form (ngSubmit)="save()" class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium">Sentence</label>
+          <input
+            type="text"
+            [(ngModel)]="formModel.sentence"
+            name="sent"
+            required
+            class="w-full px-3 py-2 border rounded-lg"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Translation</label>
+          <input
+            type="text"
+            [(ngModel)]="formModel.translation"
+            name="trans"
+            required
+            class="w-full px-3 py-2 border rounded-lg"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Question Text</label>
+          <input
+            type="text"
+            [(ngModel)]="formModel.questionText"
+            name="qt"
+            required
+            class="w-full px-3 py-2 border rounded-lg"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium">Wrong Answers</label>
+          <div *ngFor="let idx of [0, 1]" class="flex space-x-2">
+            <input
+              type="text"
+              [(ngModel)]="formModel.wrongAnswers![idx]"
+              name="wrong{{ idx }}"
+              required
+              class="flex-1 px-3 py-2 border rounded-lg"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">Correct Answer</label>
+            <input
+              type="text"
+              [(ngModel)]="formModel.correctAnswer"
+              name="correct"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Level</label>
+            <select
+              [(ngModel)]="formModel.level"
+              name="level"
+              class="w-full px-3 py-2 border rounded-lg"
+            >
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-4">
+          <button
+            type="button"
+            (click)="cancelForm()"
+            class="px-4 py-2 bg-gray-200 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-pink-600 text-white rounded-lg"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete confirm -->
+  <div
+    *ngIf="showDelete"
+    class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 space-y-3">
+      <h2 class="text-lg font-semibold">Confirm delete</h2>
+      <p>
+        Delete <strong>{{ deleteTarget?.sentence }}</strong
+        >?
+      </p>
+      <div class="flex justify-end space-x-2 pt-4">
+        <button
+          (click)="cancelDelete()"
+          class="px-4 py-2 bg-gray-200 rounded-lg"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="delete()"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

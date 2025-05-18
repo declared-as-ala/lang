@@ -1,0 +1,101 @@
+<div
+  class="chat-container h-[calc(100vh-16rem)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden"
+>
+  <div class="flex-1 overflow-y-auto p-4 space-y-4" #chatContainer>
+    <div
+      *ngFor="let message of messages"
+      class="flex"
+      [ngClass]="{
+        'justify-end': message.role === 'user',
+        'justify-start': message.role === 'assistant'
+      }"
+    >
+      <div
+        class="max-w-[80%] rounded-2xl px-4 py-3 shadow-sm"
+        [ngClass]="{
+          'bg-primary-600 text-white': message.role === 'user',
+          'bg-gray-100': message.role === 'assistant'
+        }"
+      >
+        <div
+          class="prose prose-sm"
+          [innerHTML]="message.content | markdown"
+        ></div>
+        <div class="text-xs mt-1 opacity-70">
+          {{ message.timestamp | date : "shortTime" }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-start">
+      <div class="bg-gray-100 rounded-2xl px-6 py-4 shadow-sm">
+        <div class="flex items-center space-x-2">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span class="text-sm text-gray-500">AI is thinking...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t p-4">
+    <form
+      [formGroup]="chatForm"
+      (ngSubmit)="sendMessage()"
+      class="flex items-center space-x-2"
+    >
+      <input
+        type="text"
+        formControlName="message"
+        class="flex-1 form-control"
+        placeholder="Type your message..."
+        [disabled]="isLoading"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+      />
+      <button
+        type="submit"
+        class="btn-primary p-3 rounded-full flex-shrink-0"
+        [disabled]="chatForm.invalid || isLoading"
+      >
+        <svg
+          *ngIf="!isLoading"
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+          ></path>
+        </svg>
+        <svg
+          *ngIf="isLoading"
+          class="animate-spin h-5 w-5"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>

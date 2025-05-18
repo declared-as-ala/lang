@@ -1,0 +1,6 @@
+/* responsive canvas height (optionnel, identique à avant) */
+@media (max-width: 640px) {
+  canvas {
+    max-height: 48vw !important;
+  }
+}

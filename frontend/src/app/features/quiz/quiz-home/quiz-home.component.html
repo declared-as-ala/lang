@@ -1,0 +1,55 @@
+<div class="quiz-home-container animate-fade-in">
+  <h2 class="text-2xl font-bold text-primary-600 mb-6">Quiz Dashboard</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      *ngFor="let quiz of quizTypes"
+      class="card hover:shadow-lg transition-all duration-200 hover:translate-y-[-4px] h-full"
+    >
+      <a [routerLink]="[quiz.route]" class="block h-full">
+        <div class="h-full flex flex-col">
+          <!-- Icon: Emoji + SVG -->
+          <div class="text-primary-500 mb-4 flex flex-col items-center">
+            <div class="text-3xl mb-1">{{ quiz.emoji }}</div>
+            <div [innerHTML]="getIcon(quiz.icon)"></div>
+          </div>
+
+          <!-- Quiz Name -->
+          <h3 class="text-xl font-semibold text-primary-700 mb-2 text-center">
+            {{ quiz.name }}
+          </h3>
+
+          <!-- Quiz Description -->
+          <p class="text-gray-600 text-center mt-2 mb-4 flex-grow">
+            {{ quiz.description }}
+          </p>
+
+          <!-- Start Quiz Button -->
+          <button class="btn-primary w-full mt-auto">Start Quiz</button>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Progress Section -->
+  <div class="mt-12 bg-primary-50 rounded-lg p-6">
+    <h3 class="text-xl font-semibold text-primary-700 mb-4">Your Progress</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-gray-500 mb-1">Quizzes Completed</div>
+        <div class="text-3xl font-bold text-primary-700">12</div>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-gray-500 mb-1">Accuracy Rate</div>
+        <div class="text-3xl font-bold text-primary-700">87%</div>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-gray-500 mb-1">Learning Streak</div>
+        <div class="text-3xl font-bold text-primary-700">7 days</div>
+      </div>
+    </div>
+  </div>
+</div>

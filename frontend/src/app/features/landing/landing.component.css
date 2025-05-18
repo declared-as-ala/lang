@@ -1,0 +1,97 @@
+/* Landing page animations and styles */
+.hero-container {
+  @apply relative overflow-hidden;
+}
+
+.hero-content {
+  @apply z-10 relative;
+}
+
+.round-image {
+  @apply rounded-2xl shadow-xl transition-transform duration-300 hover:scale-105;
+}
+
+.video-container {
+  @apply relative overflow-hidden py-20;
+}
+
+.video-wrapper {
+  @apply absolute inset-0 w-full h-full;
+}
+
+.background-video {
+  @apply w-full h-full object-cover opacity-50;
+}
+
+.video-text {
+  @apply relative z-10 text-center;
+}
+
+.features-section {
+  @apply py-20 px-4 bg-white;
+}
+
+.section-title {
+  @apply text-4xl font-bold text-center mb-4 text-primary-700;
+}
+
+.section-subtitle {
+  @apply text-xl text-center text-gray-600 mb-12 max-w-3xl mx-auto;
+}
+
+.features-grid {
+  @apply grid md:grid-cols-3 gap-8 max-w-6xl mx-auto;
+}
+
+.feature-card {
+  @apply bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+}
+
+.feature-icon {
+  @apply text-4xl mb-4 text-center;
+}
+
+.cta-section {
+  @apply bg-primary-600 text-white py-20 px-4 text-center;
+}
+
+.cta-button {
+  @apply bg-white text-primary-700 px-8 py-4 rounded-lg font-bold text-xl 
+         hover:bg-primary-50 transition duration-200 inline-block mt-8;
+}
+
+.lingomate-container {
+  @apply bg-gray-100 py-16 px-4;
+}
+
+.lingomate-content {
+  @apply max-w-6xl mx-auto;
+}
+
+.lingomate-sections {
+  @apply grid md:grid-cols-3 gap-12;
+}
+
+.lingomate-section h2 {
+  @apply text-lg font-semibold mb-4 text-primary-700;
+}
+
+.lingomate-section ul {
+  @apply space-y-2;
+}
+
+.lingomate-section a {
+  @apply text-gray-600 hover:text-primary-600 transition-colors;
+}
+
+.lingomate-footer {
+  @apply mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center;
+}
+
+.lingomate-footer-links {
+  @apply flex space-x-6 mt-4 md:mt-0;
+}
+
+.lingomate-footer-links a {
+  @apply text-gray-500 hover:text-primary-600 transition-colors;
+}

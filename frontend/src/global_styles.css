@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-size: 16px;
+  zoom: 90%;
+}
+body {
+  transform: scale(0.85); /* ← ajuste la valeur si besoin */
+  transform-origin: top left;
+  width: 117.65%; /* pour compenser le shrink du scale */
+}
+
+/* Base styles */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+  h1 {
+    @apply text-3xl font-bold mb-4 text-primary-700;
+  }
+  h2 {
+    @apply text-2xl font-semibold mb-3 text-primary-600;
+  }
+  h3 {
+    @apply text-xl font-semibold mb-2 text-primary-500;
+  }
+}
+
+/* Custom component classes */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-primary-700 border border-primary-300 hover:bg-primary-50 focus:ring-primary-500;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+  .form-control {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  .form-label {
+    @apply block mb-2 text-sm font-medium text-gray-700;
+  }
+  .form-error {
+    @apply mt-1 text-sm text-red-600;
+  }
+  .form-group {
+    @apply mb-4;
+  }
+  .nav-link {
+    @apply px-3 py-2 text-primary-700 hover:text-primary-900 hover:bg-primary-50 rounded-md transition duration-150;
+  }
+}
+
+/* Animation classes */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

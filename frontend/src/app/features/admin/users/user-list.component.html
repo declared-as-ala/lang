@@ -1,0 +1,417 @@
+<!-- src/app/admin/users/user.component.html -->
+<div class="relative">
+  <!-- Toast Container -->
+  <div class="fixed top-5 right-5 space-y-2 z-50">
+    <div
+      *ngFor="let t of toasts"
+      [ngClass]="{
+        'bg-green-100 text-green-800': t.type === 'success',
+        'bg-red-100 text-red-800': t.type === 'error'
+      }"
+      class="flex items-center px-4 py-2 rounded shadow"
+    >
+      <svg
+        *ngIf="t.type === 'success'"
+        class="w-5 h-5 mr-2 text-green-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      <svg
+        *ngIf="t.type === 'error'"
+        class="w-5 h-5 mr-2 text-red-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      <span>{{ t.message }}</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="p-6 space-y-6">
+    <!-- Header, Search & Create -->
+    <div
+      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+    >
+      <h1 class="text-2xl font-bold text-pink-700 flex items-center">
+        <svg
+          class="w-6 h-6 mr-2 text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 4a1 1 0 011-1h3v2H5v16h14V5h-2V3h3a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"
+          />
+        </svg>
+        <span>Manage Users</span>
+      </h1>
+      <div class="flex items-center space-x-3">
+        <div class="relative">
+          <svg
+            class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilter()"
+            placeholder="Search by name or email"
+            class="pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
+        <button
+          class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition flex items-center"
+          (click)="openCreate()"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          <span>New User</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading / Empty -->
+    <div *ngIf="isLoading" class="text-center text-gray-500">
+      Loading users…
+    </div>
+    <div
+      *ngIf="!isLoading && filtered.length === 0"
+      class="text-center text-gray-500"
+    >
+      No users found
+    </div>
+
+    <!-- User Table -->
+    <div *ngIf="!isLoading && paged.length > 0" class="overflow-x-auto">
+      <table class="w-full bg-white rounded-lg shadow">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Name
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Email
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Role
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Score
+            </th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">
+              Level
+            </th>
+            <th class="px-4 py-2 text-right text-sm font-medium text-gray-600">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of paged" class="hover:bg-gray-50">
+            <td class="px-4 py-2">{{ u.name }}</td>
+            <td class="px-4 py-2">{{ u.email }}</td>
+            <td class="px-4 py-2">{{ u.role || "—" }}</td>
+            <td class="px-4 py-2">{{ u.score }}</td>
+            <td class="px-4 py-2">{{ u.level }}</td>
+            <td class="px-4 py-2 text-right">
+              <div class="inline-flex space-x-4">
+                <!-- Edit Button -->
+                <button
+                  class="flex items-center text-pink-600 hover:text-pink-800"
+                  (click)="openEdit(u)"
+                >
+                  <svg
+                    class="w-5 h-5 inline-block mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5h2M5 12h14M5 19h14"
+                    />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+
+                <!-- Delete Button -->
+                <button
+                  class="flex items-center text-red-600 hover:text-red-800"
+                  (click)="confirmDelete(u)"
+                >
+                  <svg
+                    class="w-5 h-5 inline-block mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="!isLoading && totalPages > 1"
+      class="flex justify-center items-center space-x-2 pt-4"
+    >
+      <button
+        class="px-2 py-1 border rounded disabled:opacity-50"
+        (click)="prevPage()"
+        [disabled]="currentPage === 1"
+      >
+        Prev
+      </button>
+      <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
+        <button
+          class="px-3 py-1 rounded"
+          [ngClass]="{
+            'bg-pink-600 text-white': currentPage === i + 1,
+            'bg-gray-200': currentPage !== i + 1
+          }"
+          (click)="goToPage(i + 1)"
+        >
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+      <button
+        class="px-2 py-1 border rounded disabled:opacity-50"
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Create/Edit Modal -->
+  <div
+    *ngIf="showForm"
+    class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 space-y-6">
+      <h2 class="text-xl font-semibold flex items-center space-x-2">
+        <ng-container *ngIf="formMode === 'create'">
+          <svg
+            class="w-5 h-5 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+        </ng-container>
+        <ng-container *ngIf="formMode === 'edit'">
+          <svg
+            class="w-5 h-5 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 7h16M4 12h8m-8 5h16"
+            />
+          </svg>
+        </ng-container>
+        <span>{{ formMode === "create" ? "New User" : "Edit User" }}</span>
+      </h2>
+
+      <form (ngSubmit)="save()" class="space-y-4">
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name</label>
+          <input
+            type="text"
+            [(ngModel)]="formModel.name"
+            name="name"
+            required
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            type="email"
+            [(ngModel)]="formModel.email"
+            name="email"
+            required
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
+
+        <!-- Password (create only) -->
+        <div *ngIf="formMode === 'create'">
+          <label class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <input
+            type="password"
+            [(ngModel)]="formModel['password']"
+            name="password"
+            required
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
+
+        <!-- Role -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Role</label>
+          <input
+            type="text"
+            [(ngModel)]="formModel.role"
+            name="role"
+            placeholder="ADMIN, USER, etc."
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
+
+        <!-- Score & Level -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Score</label>
+            <input
+              type="number"
+              [(ngModel)]="formModel.score"
+              name="score"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Level</label>
+            <select
+              [(ngModel)]="formModel.level"
+              name="level"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+            >
+              <option value="BEGINNER">BEGINNER</option>
+              <option value="INTERMEDIATE">INTERMEDIATE</option>
+              <option value="ADVANCED">ADVANCED</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-2 pt-4">
+          <button
+            type="button"
+            class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+            (click)="cancelForm()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    *ngIf="showDeleteConfirm"
+    class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 space-y-4">
+      <h2 class="text-lg font-semibold flex items-center space-x-2">
+        <svg
+          class="w-5 h-5 text-red-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+        <span>Confirm delete</span>
+      </h2>
+      <p>
+        Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong
+        >?
+      </p>
+      <div class="flex justify-end space-x-2 pt-4">
+        <button
+          class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+          (click)="cancelDelete()"
+        >
+          Cancel
+        </button>
+        <button
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          (click)="delete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-100 to-white py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg animate-fade-in">
+    <div class="text-center">
+      <h1 class="mt-6 text-3xl font-extrabold text-primary-600">Create your account</h1>
+      <p class="mt-2 text-sm text-gray-600">Join Lingomate and start learning</p>
+    </div>
+    
+    <form class="mt-8 space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name</label>
+          <input id="firstName" type="text" formControlName="firstName" class="form-control" placeholder="John">
+          <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="form-error">
+            First name is required
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input id="lastName" type="text" formControlName="lastName" class="form-control" placeholder="Doe">
+          <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="form-error">
+            Last name is required
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label">Email address</label>
+        <input id="email" type="email" formControlName="email" class="form-control" placeholder="john.doe@example.com">
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="form-error">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" formControlName="password" class="form-control" placeholder="Enter your password">
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="form-error">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control" placeholder="Confirm your password">
+        <div *ngIf="registerForm.get('confirmPassword')?.touched" class="form-error">
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+          <span *ngIf="registerForm.hasError('passwordMismatch') && !registerForm.get('confirmPassword')?.errors?.['required']">
+            Passwords don't match
+          </span>
+        </div>
+      </div>
+      
+      <div *ngIf="errorMessage" class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline">{{ errorMessage }}</span>
+      </div>
+      
+      <div>
+        <button 
+          type="submit" 
+          class="btn-primary w-full flex justify-center items-center"
+          [disabled]="isLoading"
+        >
+          <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? 'Creating account...' : 'Create account' }}
+        </button>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          Already have an account?
+          <a [routerLink]="['/auth/login']" class="font-medium text-primary-600 hover:text-primary-500">
+            Sign in
+          </a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
