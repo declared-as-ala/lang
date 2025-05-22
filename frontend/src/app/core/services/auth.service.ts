@@ -80,15 +80,11 @@ export class AuthService {
     this.authError.set(null);
 
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, userData)
+      .post<AuthResponse>(`${environment.apiUrl}/auth/signup`, userData)
       .pipe(
         tap((response) => {
           if (response.success) {
-            localStorage.setItem(this.userKey, JSON.stringify(response.user));
-            localStorage.setItem(this.tokenKey, response.cookie.value);
-            this.currentUserSubject.next(response.user);
-            this.isAuthenticatedSubject.next(true);
-            this.router.navigate(["/dashboard"]);
+            this.router.navigate(["/auth/login"]);
           }
         }),
         catchError((error) => {

@@ -4,6 +4,7 @@ import com.linguabridge.backend.dto.AuthResponse;
 import com.linguabridge.backend.dto.LoginRequest;
 import com.linguabridge.backend.dto.SignupRequest;
 import com.linguabridge.backend.model.Level;
+import com.linguabridge.backend.model.Role;
 import com.linguabridge.backend.model.User;
 import com.linguabridge.backend.repository.UserRepository;
 import com.linguabridge.backend.util.JWTService;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -36,28 +39,24 @@ public class AuthService {
             throw new RuntimeException("Email already in use");
         }
 
-        logger.debug("Creating new user with email {}", request.getEmail());
         Level userLevel = request.getLevel() != null ? request.getLevel() : Level.BEGINNER;
-        logger.debug("Setting user level to: {}", userLevel);
 
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .level(userLevel)
-                .roles(request.getRoles())
+                .roles(Collections.singleton(Role.USER)) // ⬅ rôle par défaut USER
                 .build();
 
-        logger.debug("Saving user to database");
         userRepository.save(user);
         logger.info("User saved successfully with id: {}", user.getId());
 
         ResponseCookie cookie = jwtService.generateTokenCookie(
                 user.getEmail(),
                 user.getName(),
-                user.getRoles().iterator().next().name()
+                "USER"
         );
-        logger.info("Token generated successfully for user: {}", user.getEmail());
 
         AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
                 .id(user.getId())
@@ -75,56 +74,52 @@ public class AuthService {
                 .build();
     }
 
-public AuthResponse login(LoginRequest request) {
-    try {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+    public AuthResponse login(LoginRequest request) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
 
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> {
-                    logger.error("User not found with email: {}", request.getEmail());
-                    return new RuntimeException("Invalid credentials");
-                });
+            var user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> {
+                        logger.error("User not found with email: {}", request.getEmail());
+                        return new RuntimeException("Invalid credentials");
+                    });
 
-        ResponseCookie cookie = jwtService.generateTokenCookie(
-                user.getEmail(),
-                user.getName(),
-                user.getRoles().iterator().next().name()
-        );
-        logger.info("Login successful for user: {}", user.getEmail());
+            ResponseCookie cookie = jwtService.generateTokenCookie(
+                    user.getEmail(),
+                    user.getName(),
+                    user.getRoles().iterator().next().name()
+            );
 
-        AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .level(user.getLevel())
-                .roles(user.getRoles())
-                .score(user.getScore()) // ✅ Include score here
-                .build();
+            AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .level(user.getLevel())
+                    .roles(user.getRoles())
+                    .score(user.getScore())
+                    .build();
 
-        return AuthResponse.builder()
-                .success(true)
-                .message("Login successful")
-                .cookie(cookie)
-                .user(userResponse)
-                .build();
+            return AuthResponse.builder()
+                    .success(true)
+                    .message("Login successful")
+                    .cookie(cookie)
+                    .user(userResponse)
+                    .build();
 
-    } catch (Exception e) {
-        logger.error("Login failed for {}: {}", request.getEmail(), e.getMessage());
-        return AuthResponse.builder()
-                .success(false)
-                .message("Invalid email or password")
-                .build();
+        } catch (Exception e) {
+            logger.error("Login failed for {}: {}", request.getEmail(), e.getMessage());
+            return AuthResponse.builder()
+                    .success(false)
+                    .message("Invalid email or password")
+                    .build();
+        }
     }
-}
 
-    /**
-     * ⇢ Invalidate the auth_token cookie to logout user
-     */
     public ResponseEntity<?> logout() {
         ResponseCookie expiredCookie = ResponseCookie.from("auth_token", "")
                 .path("/")
@@ -133,7 +128,6 @@ public AuthResponse login(LoginRequest request) {
                 .sameSite("Lax")
                 .build();
 
-        logger.info("User logout: token cookie cleared.");
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
                 .body("Logged out successfully");

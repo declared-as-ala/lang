@@ -34,6 +34,7 @@ export class RegisterComponent {
         email: ["", [Validators.required, Validators.email]],
         password: ["", [Validators.required, Validators.minLength(6)]],
         confirmPassword: ["", [Validators.required]],
+        level: ["BEGINNER", Validators.required],
       },
       {
         validators: this.passwordMatchValidator,
@@ -58,10 +59,10 @@ export class RegisterComponent {
     this.errorMessage = null;
 
     const userData = {
-      firstName: this.registerForm.value.firstName,
-      lastName: this.registerForm.value.lastName,
+      name: `${this.registerForm.value.firstName} ${this.registerForm.value.lastName}`,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password,
+      level: this.registerForm.value.level,
     };
 
     this.authService
